@@ -1,0 +1,10 @@
+github.com/Compogo/compogo v0.0.16 h1:bWPMkYMKr5E94N4poHh3DX8EnmmoprL/h0amQCk0wrQ=
+github.com/Compogo/compogo v0.0.16/go.mod h1:LbPhr7u4g11Lv8c9tifDnD7aJf3nNRhdsz1LlMdMGcY=
+github.com/Compogo/runner v0.0.2 h1:cArEd4miCCQCnN9LoQYfXOPOravljDFUjp3PMxf9LF4=
+github.com/Compogo/runner v0.0.2/go.mod h1:4Hpaif6yFwJqQ9+XU3+QkxbXOY2qk3VM61vAxZgASbc=
+github.com/Compogo/runner v0.0.3 h1:sxIfEPvNHdJW+73wRVJ9cFBv8U8f/nWBD7mfjqqI2w0=
+github.com/Compogo/runner v0.0.3/go.mod h1:4Hpaif6yFwJqQ9+XU3+QkxbXOY2qk3VM61vAxZgASbc=
+github.com/Compogo/runner v0.0.5 h1:Q9a1VfkJ0ElINoEYuhVNmj9KCQMBzEs/7DzIsDaoTJQ=
+github.com/Compogo/runner v0.0.5/go.mod h1:4Hpaif6yFwJqQ9+XU3+QkxbXOY2qk3VM61vAxZgASbc=
+github.com/spf13/cast v1.10.0 h1:h2x0u2shc1QuLHfxi+cTJvs30+ZAHOGRic8uyGTDWxY=
+github.com/spf13/cast v1.10.0/go.mod h1:jNfB8QC9IA6ZuY2ZjDp0KtFO2LZZlg4S/7bzP6qqeHo=
