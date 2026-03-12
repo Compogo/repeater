@@ -35,10 +35,10 @@ var Component = &component.Component{
 			flagSet.DurationVar(&config.Delay, DelayFieldName, DelayDefault, "")
 		})
 	}),
-	PreRun: component.StepFunc(func(container container.Container) error {
+	Configuration: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(Configuration)
 	}),
-	Run: component.StepFunc(func(container container.Container) error {
+	Execute: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(func(r runner.Runner, repeater Repeater) error {
 			return r.RunTask(runner.NewTask("repeater", repeater))
 		})
