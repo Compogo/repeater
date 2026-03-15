@@ -8,8 +8,10 @@ import (
 	"time"
 
 	"github.com/Compogo/compogo/logger"
-	"github.com/Compogo/compogo/types"
 	"github.com/Compogo/runner"
+	"github.com/Compogo/types/linker"
+	"github.com/Compogo/types/mapper"
+	"github.com/Compogo/types/set"
 )
 
 // Repeater defines the interface for a periodic task scheduler.
@@ -46,8 +48,8 @@ type Repeater interface {
 }
 
 type repeater struct {
-	tasks      *types.Mapper[*Task]
-	taskNames  *types.Linker[*Task, types.Set[string]]
+	tasks      *mapper.Mapper[*Task]
+	taskNames  *linker.Linker[*Task, set.Set[string]]
 	middleware []Middleware
 
 	ticker     *time.Ticker
@@ -65,8 +67,8 @@ type repeater struct {
 //   - runner: for executing task instances
 func NewRepeater(config *Config, logger logger.Logger, runner runner.Runner) Repeater {
 	return &repeater{
-		tasks:     types.NewMapper[*Task](),
-		taskNames: types.NewLinker[*Task, types.Set[string]](),
+		tasks:     mapper.NewMapper[*Task](),
+		taskNames: linker.NewLinker[*Task, set.Set[string]](),
 		ticker:    time.NewTicker(config.Delay),
 		logger:    logger.GetLogger("repeater"),
 		runner:    runner,
@@ -190,7 +192,7 @@ func (r *repeater) AddTask(task *Task) error {
 	}
 
 	r.tasks.Add(task)
-	r.taskNames.Add(task, types.NewSet[string]())
+	r.taskNames.Add(task, set.NewSet[string]())
 
 	return nil
 }

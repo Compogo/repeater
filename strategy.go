@@ -3,8 +3,8 @@ package repeater
 import (
 	"fmt"
 
-	"github.com/Compogo/compogo/types"
 	"github.com/Compogo/runner"
+	"github.com/Compogo/types/linker"
 	"github.com/spf13/cast"
 )
 
@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	strategies = types.NewLinker[StrategyType, Strategy]()
+	strategies = linker.NewLinker[StrategyType, Strategy]()
 )
 
 func init() {
