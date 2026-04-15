@@ -184,12 +184,12 @@ func (r *repeater) AddTasks(tasks ...*Task) (err error) {
 }
 
 func (r *repeater) AddTask(task *Task) error {
-	r.rwMutex.Lock()
-	defer r.rwMutex.Unlock()
-
 	if r.HasTask(task) {
 		return fmt.Errorf("[repeater] task '%s' %w", task.Name(), runner.TaskAlreadyExistsError)
 	}
+
+	r.rwMutex.Lock()
+	defer r.rwMutex.Unlock()
 
 	r.tasks.Add(task)
 	r.taskNames.Add(task, set.NewSet[string]())
