@@ -1,4 +1,4 @@
-package repeater
+package config
 
 import (
 	"time"

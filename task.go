@@ -1,72 +1,73 @@
 package repeater
 
 import (
+	"context"
+	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/Compogo/runner"
 )
 
-// Task represents a periodic task managed by the Repeater.
-// It contains the task logic, execution schedule, and strategy for concurrent execution.
 type Task struct {
-	name    string
-	process runner.Process
-	delay   time.Duration
+	m sync.Mutex
 
-	strategy StrategyType
+	name        string
+	processFunc runner.ProcessFunc
 
-	nextExecuteTime atomic.Int64
-	runNumbers      atomic.Uint64
+	ctx        context.Context
+	cancelFunc context.CancelFunc
+
+	middlewares []runner.Middleware
+
+	delay      time.Duration
+	runNumbers atomic.Uint64
 }
 
-// NewTaskWithLock creates a new periodic task with Lock strategy.
-// Lock strategy ensures only one instance of this task runs at any given time.
-// The task will execute every 'delay' duration.
-func NewTaskWithLock(name string, process runner.Process, delay time.Duration, options ...Option) *Task {
-	return NewTask(name, process, delay, Lock, options...)
+func NewTask(name string, delay time.Duration, processFunc runner.ProcessFunc, middlewares ...runner.Middleware) *Task {
+	return &Task{
+		name:        name,
+		processFunc: processFunc,
+		middlewares: middlewares,
+		delay:       delay,
+	}
 }
 
-// NewTaskWithUnlock creates a new periodic task with Unlock strategy.
-// Unlock strategy allows multiple instances of this task to run concurrently.
-// The task will execute every 'delay' duration.
-func NewTaskWithUnlock(name string, process runner.Process, delay time.Duration, options ...Option) *Task {
-	return NewTask(name, process, delay, Unlock, options...)
-}
+func (task *Task) Close() error {
+	task.m.Lock()
+	defer task.m.Unlock()
 
-// NewTask creates a new periodic task with the specified strategy.
-// This is the base constructor that all other constructors use.
-func NewTask(name string, process runner.Process, delay time.Duration, strategy StrategyType, options ...Option) *Task {
-	task := &Task{name: name, process: process, delay: delay, strategy: strategy}
-
-	for _, option := range options {
-		task = option(task)
+	if task.cancelFunc != nil {
+		task.cancelFunc()
 	}
 
-	return task
+	return nil
 }
 
-// String returns the task's name, implementing fmt.Stringer.
-func (t *Task) String() string {
-	return t.Name()
+func (task *Task) Process(ctx context.Context) error {
+	task.m.Lock()
+	defer task.m.Unlock()
+
+	task.ctx, task.cancelFunc = context.WithCancel(ctx)
+	defer task.cancelFunc()
+
+	processFunc := task.processFunc
+	for i := len(task.middlewares) - 1; i >= 0; i-- {
+		processFunc = task.middlewares[i].Middleware(task, processFunc)
+	}
+
+	task.runNumbers.Add(1)
+	return processFunc(task.ctx)
 }
 
-// Name returns the task's identifier.
-func (t *Task) Name() string {
-	return t.name
+func (task *Task) Name() string {
+	return task.name
 }
 
-// Strategy returns the task's execution strategy (Lock/Unlock).
-func (t *Task) Strategy() StrategyType {
-	return t.strategy
+func (task *Task) Delay() time.Duration {
+	return task.delay
 }
 
-// Delay returns the interval between task executions.
-func (t *Task) Delay() time.Duration {
-	return t.delay
-}
-
-// RunNumbers returns the number of times this task has been executed.
-func (t *Task) RunNumbers() uint64 {
-	return t.runNumbers.Load()
+func (task *Task) RunNumbers() uint64 {
+	return task.runNumbers.Load()
 }
